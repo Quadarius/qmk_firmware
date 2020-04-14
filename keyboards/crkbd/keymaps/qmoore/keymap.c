@@ -21,6 +21,7 @@ extern uint8_t is_master;
 #define _LOWER 1
 #define _RAISE 2
 #define _ADJUST 3
+#define _CODE 4
 
 enum custom_keycodes {
   QWERTY = SAFE_RANGE,
@@ -36,10 +37,12 @@ enum custom_keycodes {
 #define KC_LOWER LOWER
 #define KC_RAISE RAISE
 
+#define KC_LRST RGBRST
+
 #define KC_CTLTB CTL_T(KC_TAB)
 #define KC_CTLEN CTL_T(KC_ENT)
 #define KC_CQUO  LT(_CODE, KC_QUOT)
-#define KC_CESC ALT_T(KC_ESC)
+#define KC_CESC CTL_T(KC_ESC)
 
 #define KC_CENT CTL_T(KC_ENT)
 #define KC_ASPC ALT_T(KC_SPC)
@@ -218,25 +221,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
         return false;
         break;
-    case RGB_MOD:
-      #ifdef RGBLIGHT_ENABLE
-        if (record->event.pressed) {
-          rgblight_mode(RGB_current_mode);
-          rgblight_step();
-          RGB_current_mode = rgblight_config.mode;
-        }
-      #endif
-      return false;
-      break;
-    case RGBRST:
-      #ifdef RGBLIGHT_ENABLE
-        if (record->event.pressed) {
-          eeconfig_update_rgblight_default();
-          rgblight_enable();
-          RGB_current_mode = rgblight_config.mode;
-        }
-      #endif
-      break;
   }
   return true;
 }
