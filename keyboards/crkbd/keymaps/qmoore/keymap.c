@@ -17,6 +17,11 @@ extern rgblight_config_t rgblight_config;
 
 extern uint8_t is_master;
 
+#define _QWERTY 0
+#define _LOWER 1
+#define _RAISE 2
+#define _ADJUST 3
+
 enum custom_keycodes {
   QWERTY = SAFE_RANGE,
   CODE,
@@ -34,21 +39,21 @@ enum custom_keycodes {
 #define KC_CTLTB CTL_T(KC_TAB)
 #define KC_CTLEN CTL_T(KC_ENT)
 #define KC_CQUO  LT(_CODE, KC_QUOT)
-#define KC_ESATL ALT_T(KC_ESC)
+#define KC_CESC ALT_T(KC_ESC)
 
-#define CTLENT CTL_T(KC_ENT)
-#define ALTSPC ALT_T(KC_SPC)
+#define KC_CENT CTL_T(KC_ENT)
+#define KC_ASPC ALT_T(KC_SPC)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_QWERTY] = LAYOUT_kc( \
   //,-----------------------------------------.                ,-----------------------------------------.
         TAB,     Q,     W,     E,     R,     T,                      Y,     U,     I,     O,     P,  BSPC,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
-      ESCTL,     A,     S,     D,     F,     G,                      H,     J,     K,     L,  SCLN,  CQUO,\
+       CESC,     A,     S,     D,     F,     G,                      H,     J,     K,     L,  SCLN,  CQUO,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
        LSFT,     Z,     X,     C,     V,     B,                      N,     M,  COMM,   DOT,  SLSH,  RSFT,\
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
-                                  LGUI, LOWER,   SPC,    CLTEN, RAISE, RALT \
+                                  LGUI, LOWER,   SPC,    CENT, RAISE, RALT \
                               //`--------------------'  `--------------------'
   ),
 
@@ -103,11 +108,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 int RGB_current_mode;
 
-void persistent_default_layer_set(uint16_t default_layer) {
-  eeconfig_update_default_layer(default_layer);
-  default_layer_set(default_layer);
-}
-
 // Setting ADJUST layer RGB back to default
 void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
   if (IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2)) {
@@ -139,8 +139,8 @@ const char *read_keylogs(void);
 
 // const char *read_mode_icon(bool swap);
 // const char *read_host_led_state(void);
-void set_timelog(void);
-const char *read_timelog(void);
+// void set_timelog(void);
+// const char *read_timelog(void);
 
 void matrix_scan_user(void) {
    iota_gfx_task();
@@ -151,10 +151,10 @@ void matrix_render_user(struct CharacterMatrix *matrix) {
     // If you want to change the display of OLED, you need to change here
     matrix_write_ln(matrix, read_layer_state());
     matrix_write_ln(matrix, read_keylog());
-    //matrix_write_ln(matrix, read_keylogs());
-    //matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_RALT_lgui));
+    matrix_write_ln(matrix, read_keylogs());
+    //matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
     //matrix_write_ln(matrix, read_host_led_state());
-    matrix_write_ln(matrix, read_timelog());
+    //matrix_write_ln(matrix, read_timelog());
   } else {
     matrix_write(matrix, read_logo());
   }
@@ -173,19 +173,20 @@ void iota_gfx_task_user(void) {
   matrix_render_user(&matrix);
   matrix_update(&display, &matrix);
 }
+#endif//SSD1306OLED
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (record->event.pressed) {
 #ifdef SSD1306OLED
     set_keylog(keycode, record);
-#endif	
-    set_timelog();
+#endif
+    // set_timelog();
   }
 
   switch (keycode) {
     case QWERTY:
       if (record->event.pressed) {
-        persistent_default_layer_set(1UL<<_QWERTY);
+        set_single_persistent_default_layer(_QWERTY);
       }
       return false;
       break;
@@ -217,8 +218,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
         return false;
         break;
+    case RGB_MOD:
+      #ifdef RGBLIGHT_ENABLE
+        if (record->event.pressed) {
+          rgblight_mode(RGB_current_mode);
+          rgblight_step();
+          RGB_current_mode = rgblight_config.mode;
+        }
+      #endif
+      return false;
+      break;
+    case RGBRST:
+      #ifdef RGBLIGHT_ENABLE
+        if (record->event.pressed) {
+          eeconfig_update_rgblight_default();
+          rgblight_enable();
+          RGB_current_mode = rgblight_config.mode;
+        }
+      #endif
+      break;
   }
   return true;
 }
 
-#endif
