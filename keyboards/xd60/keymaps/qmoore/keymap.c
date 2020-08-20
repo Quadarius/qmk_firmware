@@ -18,9 +18,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	),
 	[_FN] = LAYOUT_60_ansi(
 		KC_ESC,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_DEL,
-		_______, KC_HOME, KC_UP,   KC_END,  _______, _______, _______, _______, KC_MUTE, _______, _______, KC_PGDN, KC_PGUP, KC_PIPE,
-		_______, KC_LEFT, KC_DOWN, KC_RGHT, _______, _______, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, KC_DQUO, RGB_TOG,
-		_______, _______, _______, _______, KC_UNDS, _______, KC_SLCK, KC_VOLD, KC_VOLU, KC_PAUS, KC_QUES, _______,
+		_______, KC_HOME, KC_UP,   KC_END,  _______, _______, _______, KC_HOME, KC_INS,  _______, _______, KC_PGDN, KC_PGUP, KC_PIPE,
+		_______, KC_LEFT, KC_DOWN, KC_RGHT, KC_MINS, KC_EQL,  KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, KC_COLN, KC_DQUO, RGB_TOG,
+		_______, _______, _______, _______, KC_UNDS, _______, _______, KC_END,  _______, _______, KC_QUES, _______,
 		_______, _______,          _______,                   _______,                            _______, _______, _______, _______
 	)
 };
